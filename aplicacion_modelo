@@ -1,0 +1,35 @@
+###importo librerias
+import torch
+print(torch.__version__t)
+torch.cuda.is_available()
+from ultralytics import YOLO
+import cv2
+### creo modelo
+model = YOLO("yolov8n-seg.pt")
+###entreno modelo
+dataset='C:/Users/Nahuel/Desktop/Nahuel/Proyectos/ProyectoSenas/dataset.yaml'
+resultados=model.train(data=dataset, epochs=100, imgsz=640)
+###leo modelo entrenado
+modelo_path = "C:/Users/Nahuel/Desktop/Nahuel/Proyectos/ProyectoSenas/runs/segment/train/weights/best.pt"
+modelo = YOLO(modelo_path)
+##realizo video caputura
+cap= cv2.VideoCapture(0)
+#creo bucle
+while True:
+    ##leer fotograma
+    ret, frame = cap.read()
+
+    res=modelo.predict(frame, imgsz=640, conf=0.70)
+    ##mostramos resultados
+    anotaciones=res[0].plot()
+
+    ##mostrar fotograma
+    cv2.imshow('Deteccion y segmentacion', anotaciones)
+    # Cerrar nuestro programa al presionar ESC
+    if cv2.waitKey(1)== 27:  # 27 es el código ASCII para la tecla ESC
+        break
+
+# Liberar los recursos
+cap.release()
+cv2.destroyAllWindows()
+print("El programa ha terminado.")
